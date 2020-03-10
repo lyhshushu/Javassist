@@ -1,0 +1,2 @@
+include ':app', ':buildSrc', ':hack', ':hotpatch'
+rootProject.name='Javassist'
