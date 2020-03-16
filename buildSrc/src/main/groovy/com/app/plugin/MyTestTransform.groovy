@@ -19,7 +19,7 @@ public class MyTestTransform extends Transform {
 
     @Override
     String getName() {
-        return "MyTestTrans"
+        return Transform.simpleName;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class MyTestTransform extends Transform {
                    TransformOutputProvider outputProvider, boolean isIncremental)
             throws IOException, TransformException, InterruptedException {
 
-        def startTime=System.currentTimeMillis();
+        def startTime = System.currentTimeMillis();
 
         //获取hack module的debug目录，也就是Antilazy.class所在的目录
         def libPath = project.project(':hack').buildDir.absolutePath.concat("\\intermediates\\javac\\debug")
@@ -89,6 +89,6 @@ public class MyTestTransform extends Transform {
         // outputProvider可以获取outputs的路径
 
         ClassPool.getDefault().clearImportedPackages()
-        project.logger.error("javassistTransform Cast:"+(System.currentTimeMillis() - startTime)/1000+"second")
+        project.logger.error("javassistTransform Cast:" + (System.currentTimeMillis() - startTime) / 1000 + "second")
     }
 }

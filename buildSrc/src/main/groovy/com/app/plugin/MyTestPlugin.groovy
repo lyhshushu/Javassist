@@ -15,7 +15,7 @@ public class MyTestPlugin implements Plugin<Project>{
         if(isApp){
             def android = project.extensions.findByType(AppExtension)
             android.registerTransform(new MyTestTransform(project))
-            project.logger.error "================\n自定义插件成功！开始修改Class文件\n=========="
+            project.logger.error "================\n自定义插件成功！开始修改Class文件\n================"
         }
     }
 }

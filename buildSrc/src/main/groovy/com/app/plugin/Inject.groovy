@@ -1,9 +1,15 @@
 package com.app.plugin
 
-
+import javassist.ClassClassPath
+import javassist.ClassPath
 import javassist.ClassPool
 import javassist.CtClass
+import javassist.CtMember
+import javassist.CtMethod
+import javassist.expr.ConstructorCall
 import org.apache.commons.io.FileUtils
+
+import java.lang.reflect.Constructor
 
 
 /**
@@ -12,7 +18,6 @@ import org.apache.commons.io.FileUtils
  */
 public class Inject {
     private static ClassPool pool = ClassPool.getDefault()
-
 
 
     /**
@@ -94,20 +99,29 @@ public class Inject {
      */
     private static void injectClass(String className, String path) {
 //        CtClass c = pool.getCtClass(className)
+//        pool.insertClassPath("com.example.javassist.CatSay")
+
+
         CtClass c = pool.get("com.example.javassist.Cat")
-        ClassPool child = new ClassPool(pool)
-        child.appendSystemPath()
-        child.childFirstLookup=true
+        CtMethod ctMethod=c.getDeclaredMethod("say")
+        CtClass cParent = pool.get("com.example.javassist.DogSay")
+//        ClassPool child = new ClassPool(pool)
+//        child.appendSystemPath()
+//        child.childFirstLookup=true
         if (c.isFrozen()) {
             c.defrost()
         }
-        def constructor = c.getConstructors()[0]
-
-
+        //插入
+        ctMethod.insertAt(23,"return super.say();")
+//        修改构建类代码
+//        def constructor = c.getConstructors()[0]
 //        constructor.insertAfter("System.out.println(com.example.javassist.AntilazyLoad.class);")
-//        constructor.insertAfter("System.out.println(\"sadasdada\");")
+//        constructor.insertBefore("System.out.println(\"sadasdada\");")
 
-       c.setSuperclass(pool.get("com.example.javassist.DogSay"))
+
+
+        c.setSuperclass(cParent)
+//       c.setSuperclass(pool.get("com.example.javassist.DogSay"))
         c.writeFile(path)
         c.detach()
     }
