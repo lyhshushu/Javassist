@@ -1,7 +1,6 @@
 package com.app.plugin
 
 import com.android.build.api.transform.*
-import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.utils.FileUtils
 import com.google.common.collect.Sets
 import javassist.ClassPool

@@ -1,15 +1,13 @@
 package com.app.plugin
 
-import javassist.ClassClassPath
-import javassist.ClassPath
+import javassist.CannotCompileException
 import javassist.ClassPool
 import javassist.CtClass
-import javassist.CtMember
-import javassist.CtMethod
 import javassist.expr.ConstructorCall
+import javassist.expr.ExprEditor
+import javassist.expr.MethodCall
 import org.apache.commons.io.FileUtils
-
-import java.lang.reflect.Constructor
+import org.gradle.internal.impldep.org.yaml.snakeyaml.constructor.Construct
 
 
 /**
@@ -17,9 +15,8 @@ import java.lang.reflect.Constructor
  * 另外一种是jar包，需要先解压jar包，注入代码后重新打包成jar
  */
 public class Inject {
+
     private static ClassPool pool = ClassPool.getDefault()
-
-
     /**
      * 添加classpool到Classpool
      * @param libpath
@@ -53,7 +50,9 @@ public class Inject {
                     if (index != -1) {
                         int end = filePath.length() - 6;
                         String className = filePath.substring(index, end).replace('\\', '.').replace('/', '.')
-                        injectClass(className, path)
+                        if (className == "com.example.javassist.MainActivity") {
+                            injectClass(className, path)
+                        }
                     }
                 }
             }
@@ -99,30 +98,52 @@ public class Inject {
      */
     private static void injectClass(String className, String path) {
 //        CtClass c = pool.getCtClass(className)
-//        pool.insertClassPath("com.example.javassist.CatSay")
-
-
-        CtClass c = pool.get("com.example.javassist.Cat")
-        CtMethod ctMethod=c.getDeclaredMethod("say")
-        CtClass cParent = pool.get("com.example.javassist.DogSay")
-//        ClassPool child = new ClassPool(pool)
-//        child.appendSystemPath()
-//        child.childFirstLookup=true
-        if (c.isFrozen()) {
-            c.defrost()
+        CtClass c = pool.get("com.example.javassist.MainActivity")
+        //当前父类
+        def originSuperCls = c.superclass;
+        //当前Activity向上回溯，直到找到要替换的Activity
+        def superCls = originSuperCls;
+        while (superCls != null && !(superCls.name == "com.example.javassist.BaseActivity")) {
+            c = superCls
+            superCls = c.superclass
         }
-        //插入
-        ctMethod.insertAt(23,"return super.say();")
+        if (c.name == "com.example.javassist.BaseNewActivity") {
+            return;
+        }
+
+        if (superCls != null) {
+            //开始插入代码（activity如果修改继承直接插入会出错）
+            CtClass cParent = pool.get("com.example.javassist.BaseNewActivity")
+            //解冻
+            if (c.isFrozen()) {
+                c.defrost()
+            }
+            //插入代码语句
+//        ctMethod.insertAt(23,"return super.say();")
 //        修改构建类代码
 //        def constructor = c.getConstructors()[0]
 //        constructor.insertAfter("System.out.println(com.example.javassist.AntilazyLoad.class);")
 //        constructor.insertBefore("System.out.println(\"sadasdada\");")
 
+            c.setSuperclass(cParent)
 
-
-        c.setSuperclass(cParent)
+            c.getDeclaredMethods().each { outerMethod ->
+                outerMethod.instrument(new ExprEditor() {
+                    @Override
+                    void edit(ConstructorCall call) throws CannotCompileException {
+                        if (call.isSuper()) {
+                            if (call.getMethod().getReturnType().getName() == 'void') {
+                                call.replace('{super.' + call.getMethodName() + '($$);}')
+                            } else {
+                                call.replace('{$_=super.' + call.getMethodName() + '($$);}')
+                            }
+                        }
+                    }
+                })
+            }
 //       c.setSuperclass(pool.get("com.example.javassist.DogSay"))
-        c.writeFile(path)
-        c.detach()
+            c.writeFile(path)
+            c.detach()
+        }
     }
 }

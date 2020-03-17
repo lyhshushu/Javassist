@@ -1,15 +1,18 @@
 package com.example.javassist;
 
-import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
-import android.os.Bundle;
-import android.util.Log;
+//import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+import android.os.Bundle;
 
-public class MainActivity extends AppCompatActivity {
+import java.security.PublicKey;
+
+/**
+ * @author 4399lyh
+ */
+public class MainActivity extends BaseActivity{
 
     private Cat mCat;
     Button catSay;
@@ -20,9 +23,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         catSay = findViewById(R.id.say);
-        Log.e("--->", "===================");
-        new AntilazyLoad();
-        Log.e("--->", "===================");
         mCat = new Cat();
         catSay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -31,5 +31,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 }
