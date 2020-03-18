@@ -4,9 +4,14 @@ package com.example.javassist;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.os.Bundle;
 
-public class BaseNewActivity extends AppCompatActivity {
+@SuppressLint("Registered")
+public class BaseNewActivity extends InsteadActivity {
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

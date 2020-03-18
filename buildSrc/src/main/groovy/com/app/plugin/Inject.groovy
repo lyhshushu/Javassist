@@ -3,12 +3,9 @@ package com.app.plugin
 import javassist.CannotCompileException
 import javassist.ClassPool
 import javassist.CtClass
-import javassist.expr.ConstructorCall
 import javassist.expr.ExprEditor
 import javassist.expr.MethodCall
 import org.apache.commons.io.FileUtils
-import org.gradle.internal.impldep.org.yaml.snakeyaml.constructor.Construct
-
 
 /**
  * 注入代码的2中情况，一种是目录，需要遍历里面的class进行注入
@@ -16,7 +13,28 @@ import org.gradle.internal.impldep.org.yaml.snakeyaml.constructor.Construct
  */
 public class Inject {
 
-    private static ClassPool pool = ClassPool.getDefault()
+//    def private static LOADER_PROP_FILE = 'loader_activities.properties'
+
+    def private static changeActivityRules = [
+            "com.example.javassist.BaseActivity"   : "com.example.javassist.BaseNewActivity",
+            "com.example.javassist.InsteadActivity": "android.app.Activity",
+            "com.example.javassist.CatSay"         : "com.example.javassist.DogSay",
+    ]
+
+//    @Override
+//    def injectClass(ClassPool pool, String dir, Map config) {
+//        init()
+//        /* 遍历程序中声明的所有 Activity */
+//        //每次都new一下，否则多个variant一起构建时只会获取到首个manifest
+//        new ManifestAPI().getActivities(project,variantDir).each {
+//            //处理没有被忽略的Activity
+//            if(!(it in CommonData.ignoredActivities)){
+//
+//            }
+//        }
+//    }
+
+    private static ClassPool pool = ClassPool.getDefault();
     /**
      * 添加classpool到Classpool
      * @param libpath
@@ -34,6 +52,9 @@ public class Inject {
      * @param path 目录路径
      */
     public static void injectDir(String path) {
+        pool.insertClassPath("C:\\Users\\4399\\AppData\\Local\\Android\\Sdk\\platforms\\android-29\\android.jar")
+//      尝试去找到androidX的包（appCompatActivity）
+//        pool.insertClassPath("C:\\Users\\4399\\AppData\\Local\\Android\\Sdk\\build-tools\\29.0.2\\renderscript\\lib\\androidx-rs.jar")
         pool.appendClassPath(path)
         File dir = new File(path)
         if (dir.isDirectory()) {
@@ -50,9 +71,7 @@ public class Inject {
                     if (index != -1) {
                         int end = filePath.length() - 6;
                         String className = filePath.substring(index, end).replace('\\', '.').replace('/', '.')
-                        if (className == "com.example.javassist.MainActivity") {
-                            injectClass(className, path)
-                        }
+                        injectClass(className, path)
                     }
                 }
             }
@@ -98,22 +117,23 @@ public class Inject {
      */
     private static void injectClass(String className, String path) {
 //        CtClass c = pool.getCtClass(className)
-        CtClass c = pool.get("com.example.javassist.MainActivity")
+        CtClass c = pool.get(className)
         //当前父类
         def originSuperCls = c.superclass;
-        //当前Activity向上回溯，直到找到要替换的Activity
+//        当前Activity向上回溯，直到找到要替换的Activity
         def superCls = originSuperCls;
-        while (superCls != null && !(superCls.name == "com.example.javassist.BaseActivity")) {
+        while (superCls != null && !(superCls.name in changeActivityRules.keySet())) {
             c = superCls
             superCls = c.superclass
         }
-        if (c.name == "com.example.javassist.BaseNewActivity") {
+        //问题：如果此类中的父类又在key中就无法替换到
+        if (c.name in changeActivityRules.values()) {
             return;
         }
 
         if (superCls != null) {
             //开始插入代码（activity如果修改继承直接插入会出错）
-            CtClass cParent = pool.get("com.example.javassist.BaseNewActivity")
+            CtClass cParent = pool.get(changeActivityRules.get(superCls.name))
             //解冻
             if (c.isFrozen()) {
                 c.defrost()
@@ -125,12 +145,12 @@ public class Inject {
 //        constructor.insertAfter("System.out.println(com.example.javassist.AntilazyLoad.class);")
 //        constructor.insertBefore("System.out.println(\"sadasdada\");")
 
+            //单独方法针对
             c.setSuperclass(cParent)
-
-            c.getDeclaredMethods().each { outerMethod ->
+            c.getMethods().each { outerMethod ->
                 outerMethod.instrument(new ExprEditor() {
                     @Override
-                    void edit(ConstructorCall call) throws CannotCompileException {
+                    void edit(MethodCall call) throws CannotCompileException {
                         if (call.isSuper()) {
                             if (call.getMethod().getReturnType().getName() == 'void') {
                                 call.replace('{super.' + call.getMethodName() + '($$);}')
@@ -146,4 +166,24 @@ public class Inject {
             c.detach()
         }
     }
+
+
+//    def private init() {
+//        //延迟初始化
+//        //todo 从配置读取，不写死在代码中
+//        if (changeActivityRules == null) {
+//            def buildSrcPath = project.project(':buildSrc').projectDir.absolutePath
+//            def loaderConfigPath = String.join(File.separator, buildSrcPath, 'res', LOADER_PROP_FILE)
+//
+//            changeActivityRules = new Properties()
+//            new File(loaderConfigPath).withInputStream {
+//                changeActivityRules.load(it)
+//            }
+//            println '\n>>> Activity Rules：'
+//            loaderActivityRules.each {
+//                println it
+//            }
+//            println()
+//        }
+//    }
 }

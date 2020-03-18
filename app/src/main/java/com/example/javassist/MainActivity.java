@@ -1,18 +1,18 @@
 package com.example.javassist;
 
-
-//import android.os.Bundle;
+import android.app.Activity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import android.os.Bundle;
 
-import java.security.PublicKey;
+//import androidx.appcompat.app.AppCompatActivity;
+
 
 /**
  * @author 4399lyh
  */
-public class MainActivity extends BaseActivity{
+public class MainActivity extends BaseActivity {
 
     private Cat mCat;
     Button catSay;
