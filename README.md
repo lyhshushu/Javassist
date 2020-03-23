@@ -1,4 +1,4 @@
-# Javassist
+# Javassist_demo
 - hack模块只有一个测试类，只是为了验证以前的修改是否有效
 - hotpatch模块是部分热插件代码，此版本中无实际用处，以及app中对应类也未实际使用
 - app模块中是将被修改部分activity以及data类
