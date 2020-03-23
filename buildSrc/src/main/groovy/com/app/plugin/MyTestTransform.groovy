@@ -30,6 +30,7 @@ public class MyTestTransform extends Transform {
     @Override
     Set<? super QualifiedContent.Scope> getScopes() {
 //        return TransformManager.SCOPE_FULL_PROJECT
+        //含有一个失效方法待修正
         return Sets.immutableEnumSet(QualifiedContent.Scope.PROJECT, QualifiedContent.Scope.PROJECT_LOCAL_DEPS,
                 QualifiedContent.Scope.SUB_PROJECTS, QualifiedContent.Scope.SUB_PROJECTS_LOCAL_DEPS, QualifiedContent.Scope.EXTERNAL_LIBRARIES)
     }
@@ -45,12 +46,12 @@ public class MyTestTransform extends Transform {
                    TransformOutputProvider outputProvider, boolean isIncremental)
             throws IOException, TransformException, InterruptedException {
 
-        def startTime = System.currentTimeMillis();
+        def startTime = System.currentTimeMillis()
 
-        //获取hack module的debug目录，也就是Antilazy.class所在的目录
-        def libPath = project.project(':hack').buildDir.absolutePath.concat("\\intermediates\\javac\\debug")
+        //获取hack module的debug目录，也就是Antilazy.class所在的目录(之前验证的代码)
+//        def libPath = project.project(':hack').buildDir.absolutePath.concat("\\intermediates\\javac\\debug")
         //将路径添加到ClassPool的classPath中
-        Inject.appendClasspath(libPath)
+//        Inject.appendClasspath(libPath)
 
         // Transform的inputs有两种类型，一种是目录，一种是jar包，要分开遍历
         inputs.each { TransformInput input ->

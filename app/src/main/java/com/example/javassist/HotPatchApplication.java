@@ -1,6 +1,5 @@
 package com.example.javassist;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
 import android.os.Environment;
 
@@ -9,6 +8,7 @@ import com.example.hotpatch.HotPatch;
 
 /**
  * @author 4399lyh
+ * （目前无用）
  */
 public class HotPatchApplication extends Application {
     @Override

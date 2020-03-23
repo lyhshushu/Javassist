@@ -13,26 +13,13 @@ import org.apache.commons.io.FileUtils
  */
 public class Inject {
 
-//    def private static LOADER_PROP_FILE = 'loader_activities.properties'
-
+    //修改的父类————map存储
     def private static changeActivityRules = [
             "com.example.javassist.BaseActivity"   : "com.example.javassist.BaseNewActivity",
             "com.example.javassist.InsteadActivity": "android.app.Activity",
             "com.example.javassist.CatSay"         : "com.example.javassist.DogSay",
     ]
 
-//    @Override
-//    def injectClass(ClassPool pool, String dir, Map config) {
-//        init()
-//        /* 遍历程序中声明的所有 Activity */
-//        //每次都new一下，否则多个variant一起构建时只会获取到首个manifest
-//        new ManifestAPI().getActivities(project,variantDir).each {
-//            //处理没有被忽略的Activity
-//            if(!(it in CommonData.ignoredActivities)){
-//
-//            }
-//        }
-//    }
 
     private static ClassPool pool = ClassPool.getDefault();
     /**
@@ -52,9 +39,12 @@ public class Inject {
      * @param path 目录路径
      */
     public static void injectDir(String path) {
-        pool.insertClassPath("C:\\Users\\4399\\AppData\\Local\\Android\\Sdk\\platforms\\android-29\\android.jar")
-//      尝试去找到androidX的包（appCompatActivity）
-//        pool.insertClassPath("C:\\Users\\4399\\AppData\\Local\\Android\\Sdk\\build-tools\\29.0.2\\renderscript\\lib\\androidx-rs.jar")
+        //可能存在问题？
+        //androidX的jar包为项目开始时下载的，无法直接导入
+        //未来在继承的类中如果又再次出现了其他自定义数据类型classpool中未加载需要手动导入（方法：添加依赖之后相同方法import路径添加路径到ClassPool中）
+        pool.insertClassPath("buildSrc\\src\\main\\assets\\android.jar")
+        //androidx的包添加？？？
+
         pool.appendClassPath(path)
         File dir = new File(path)
         if (dir.isDirectory()) {
@@ -64,7 +54,7 @@ public class Inject {
                         && !filePath.contains('R$')
                         && !filePath.contains('R.class')
                         && !filePath.contains("BuildConfig.class")
-                        //这里application的名字可以通过解析清单文件获得，此处先写死
+                        //这里application的名字可以通过解析清单文件获得，此处先写死(目前无实际用处可不写)
                         && !filePath.contains("PatchApplication.class")) {
                     //这里是应用包名，也可从清单文件中获取
                     int index = filePath.indexOf("com\\example\\javassist")
@@ -168,22 +158,4 @@ public class Inject {
     }
 
 
-//    def private init() {
-//        //延迟初始化
-//        //todo 从配置读取，不写死在代码中
-//        if (changeActivityRules == null) {
-//            def buildSrcPath = project.project(':buildSrc').projectDir.absolutePath
-//            def loaderConfigPath = String.join(File.separator, buildSrcPath, 'res', LOADER_PROP_FILE)
-//
-//            changeActivityRules = new Properties()
-//            new File(loaderConfigPath).withInputStream {
-//                changeActivityRules.load(it)
-//            }
-//            println '\n>>> Activity Rules：'
-//            loaderActivityRules.each {
-//                println it
-//            }
-//            println()
-//        }
-//    }
 }

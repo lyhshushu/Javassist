@@ -6,6 +6,9 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 
+/**
+ * @author 4399lyh
+ */
 @SuppressLint("Registered")
 public class InsteadActivity extends Activity {
 
