@@ -48,10 +48,11 @@ public class MyTestTransform extends Transform {
 
         def startTime = System.currentTimeMillis()
 
+        //添加module
         //获取hack module的debug目录，也就是Antilazy.class所在的目录(之前验证的代码)
-//        def libPath = project.project(':hack').buildDir.absolutePath.concat("\\intermediates\\javac\\debug")
+        def libPath = project.project(':hack').buildDir.absolutePath.concat("\\intermediates\\javac\\debug")
         //将路径添加到ClassPool的classPath中
-//        Inject.appendClasspath(libPath)
+        Inject.appendClasspath(libPath)
 
         // Transform的inputs有两种类型，一种是目录，一种是jar包，要分开遍历
         inputs.each { TransformInput input ->
@@ -89,6 +90,7 @@ public class MyTestTransform extends Transform {
         // outputProvider可以获取outputs的路径
 
         ClassPool.getDefault().clearImportedPackages()
+        //答应时间提示transform完成
         project.logger.error("javassistTransform Cast:" + (System.currentTimeMillis() - startTime) / 1000 + "second")
     }
 }

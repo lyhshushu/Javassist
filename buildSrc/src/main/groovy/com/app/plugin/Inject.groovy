@@ -18,6 +18,7 @@ public class Inject {
             "com.example.javassist.BaseActivity"   : "com.example.javassist.BaseNewActivity",
             "com.example.javassist.InsteadActivity": "android.app.Activity",
             "com.example.javassist.CatSay"         : "com.example.javassist.DogSay",
+            "com.example.hack.CatSay"              : "com.example.hack.DogSay",
     ]
 
 
@@ -43,7 +44,8 @@ public class Inject {
         //androidX的jar包为项目开始时下载的，无法直接导入
         //未来在继承的类中如果又再次出现了其他自定义数据类型classpool中未加载需要手动导入（方法：添加依赖之后相同方法import路径添加路径到ClassPool中）
         pool.insertClassPath("buildSrc\\src\\main\\assets\\android.jar")
-        //androidx的包添加？？？
+//        pool.insertClassPath("hack\\src\\main\\java\\com\\example\\hack")
+        //TODO androidx的包添加？？？
 
         pool.appendClassPath(path)
         File dir = new File(path)
@@ -131,9 +133,9 @@ public class Inject {
             //插入代码语句
 //        ctMethod.insertAt(23,"return super.say();")
 //        修改构建类代码
-//        def constructor = c.getConstructors()[0]
-//        constructor.insertAfter("System.out.println(com.example.javassist.AntilazyLoad.class);")
-//        constructor.insertBefore("System.out.println(\"sadasdada\");")
+            def constructor = c.getConstructors()[0]
+//            constructor.insertAfter("System.out.println(com.example.javassist.AntilazyLoad.class);")
+            constructor.insertBefore("System.out.println(\"此类被修改\");")
 
             //单独方法针对
             c.setSuperclass(cParent)
