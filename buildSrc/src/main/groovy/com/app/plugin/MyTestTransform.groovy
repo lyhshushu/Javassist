@@ -18,7 +18,8 @@ public class MyTestTransform extends Transform {
 
     @Override
     String getName() {
-        return Transform.simpleName;
+        return "preDex";
+//        return Transform.simpleName;
     }
 
     @Override
