@@ -60,6 +60,7 @@ public class Inject {
                         && !filePath.contains("PatchApplication.class")) {
                     //这里是应用包名，也可从清单文件中获取
                     int index = filePath.indexOf("com\\example\\javassist")
+//                    int index = filePath.indexOf("com\\example\\hack")
                     if (index != -1) {
                         int end = filePath.length() - 6;
                         String className = filePath.substring(index, end).replace('\\', '.').replace('/', '.')
